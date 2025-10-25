@@ -11,12 +11,17 @@ class MouseScenarioRecorder:
         return self.scenario
 
     def start_scenario_record(self):
-        self.scenario.append(pyautogui.position())
-        self.parentWindow.iconify()
+        self.prepare_for_record()
         self.record()
 
-    def record(self):
+    def prepare_for_record(self):
+        self.scenario.append(pyautogui.position())
+        self.parentWindow.iconify()
+        if self.scenario:
+            self.clear_scenario()
         self.record_finished = False
+
+    def record(self):
         stop_record_hotkey = keyboard.add_hotkey("ctrl+p", self.finish_record)
         while not self.record_finished:
             self.scenario.append(pyautogui.position())

@@ -18,13 +18,12 @@ class MainWindow(Tk):
         self.mouseMover = mover.MouseMover()
 
     def start_scenario_record(self):
-        self.mouseScenarioRecorder.clear_scenario()
         print("Запись началась")
         self.mouseScenarioRecorder.start_scenario_record()
-        self.mouseMover.set_scenario(self.mouseScenarioRecorder.get_scenario())
         print("Запись завершена!")
 
     def exec_scenario(self):
+        self.mouseMover.set_scenario(self.mouseScenarioRecorder.get_scenario())
         self.mouseMover.start_scenario()
     
     def take_screenshot(self):
