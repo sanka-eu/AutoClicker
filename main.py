@@ -34,7 +34,7 @@ class MainWindow(Tk):
         for el in mouseClickScenario:
             el.insert(0, mover.MouseEvent.MouseLeftClick)
 
-        general_scenario = mouseClickScenario + mouseClickScenario
+        general_scenario = mouseMoveScenario + mouseClickScenario
         general_scenario.sort(key=lambda row: row[1])
         return general_scenario
 
