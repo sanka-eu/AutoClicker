@@ -20,10 +20,19 @@ class MainWindow(Tk):
 
     def start_scenario_record(self):
         print("Запись началась")
-        mouseMoveScenarioRecorderThread = threading.Thread(target=self.mouseMoveScenarioRecorder.start_scenario_record, args=[pyautogui.position()])
-        mouseMoveScenarioRecorderThread.start()
-        mouseClickScenarioRecorderThread = threading.Thread(target=self.mouseClickScenarioRecorder.start_scenario_record)
-        mouseClickScenarioRecorderThread.start()
+        self.mouseMoveScenarioRecorderThread = threading.Thread(target=self.mouseMoveScenarioRecorder.start_scenario_record, args=[pyautogui.position()], daemon=True)
+        self.mouseMoveScenarioRecorderThread.start()
+        self.mouseClickScenarioRecorderThread = threading.Thread(target=self.mouseClickScenarioRecorder.start_scenario_record, daemon=True)
+        self.mouseClickScenarioRecorderThread.start()
+
+        self.check_threads_finished()
+
+    def check_threads_finished(self):
+        if (self.mouseMoveScenarioRecorderThread.is_alive() or
+            self.mouseClickScenarioRecorderThread.is_alive()):
+            self.after(50, self.check_threads_finished)
+            return
+
         print("Запись завершена!")
 
     def calculate_general_scenario(self):

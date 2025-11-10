@@ -72,8 +72,8 @@ class MouseClickScenarioRecorder(MouseScenarioRecorder):
         listener.start()
         while not self.record_finished:
             pyautogui.sleep(0.05)
+        listener.stop()
         listener.join()
-        keyboard.remove_hotkey(stop_record_hotkey)
 
     def on_click_handler(self, x, y, button, pressed):
         self.scenario.append([datetime.datetime.now().time(), pyautogui.Point(x, y)])
