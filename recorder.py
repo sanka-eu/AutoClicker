@@ -30,8 +30,7 @@ class MouseMoveScenarioRecorder(MouseScenarioRecorder):
     def prepare_for_record(self):
         self.scenario.append(pyautogui.position())
         self.parentWindow.iconify()
-        if self.scenario:
-            self.clear_scenario()
+        self.clear_scenario()
         self.record_finished = False
 
     def record(self):
@@ -48,7 +47,8 @@ class MouseMoveScenarioRecorder(MouseScenarioRecorder):
         self.scenario.append([datetime.datetime.now().time(), pyautogui.position()])
 
     def clear_scenario(self):
-        self.scenario.clear()
+        if self.scenario:
+            self.scenario.clear()
 
     def get_scenario(self):
         self.scenario.sort(key = lambda row: row[0])
@@ -66,6 +66,7 @@ class MouseClickScenarioRecorder(MouseScenarioRecorder):
 
     def start_scenario_record(self):
         self.record_finished = False
+        self.clear_scenario()
         stop_record_hotkey = keyboard.add_hotkey("ctrl+p", self.finish_record)
         listener = mouse.Listener(on_click=self.on_click_handler)
         listener.start()
@@ -83,7 +84,8 @@ class MouseClickScenarioRecorder(MouseScenarioRecorder):
         #return [el[1] for el in self.scenario]
 
     def clear_scenario(self):
-        self.scenario.clear()
+        if self.scenario:
+            self.scenario.clear()
 
     def finish_record(self):
         self.record_finished = True
