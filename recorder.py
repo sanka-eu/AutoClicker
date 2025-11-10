@@ -4,6 +4,7 @@ import pyautogui
 import datetime
 from tkinter import Tk
 from abc import ABC, abstractmethod
+import copy
 
 class MouseScenarioRecorder(ABC):
 
@@ -51,7 +52,7 @@ class MouseMoveScenarioRecorder(MouseScenarioRecorder):
 
     def get_scenario(self):
         self.scenario.sort(key = lambda row: row[0])
-        return self.scenario
+        return copy.deepcopy(self.scenario)
         #return [el[1] for el in self.scenario]
 
     def finish_record(self):
@@ -78,7 +79,7 @@ class MouseClickScenarioRecorder(MouseScenarioRecorder):
 
     def get_scenario(self):
         self.scenario.sort(key = lambda row: row[0])
-        return self.scenario
+        return copy.deepcopy(self.scenario)
         #return [el[1] for el in self.scenario]
 
     def clear_scenario(self):
