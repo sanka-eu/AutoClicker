@@ -20,8 +20,7 @@ class MouseMoveScenarioRecorder(MouseScenarioRecorder):
     def __init__(self):
         self.scenario = []
 
-    def start_scenario_record(self, startPosition: pyautogui.Point):
-        self.startPosition = startPosition
+    def start_scenario_record(self):
         self.prepare_for_record()
         self.record()
 
@@ -37,7 +36,6 @@ class MouseMoveScenarioRecorder(MouseScenarioRecorder):
             print(pyautogui.position())
             pyautogui.sleep(0.05)
         keyboard.remove_hotkey(stop_record_hotkey)
-        pyautogui.moveTo(self.startPosition)
 
     def append_scenario_element(self):
         self.scenario.append([datetime.datetime.now().time(), pyautogui.position()])

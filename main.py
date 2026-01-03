@@ -21,8 +21,9 @@ class MainWindow(Tk):
     def start_scenario_record(self):
         print("Запись началась")
         self.iconify()
+        self.startMousePosition = pyautogui.position()
 
-        self.mouseMoveScenarioRecorderThread = threading.Thread(target=self.mouseMoveScenarioRecorder.start_scenario_record, args=[pyautogui.position()], daemon=True)
+        self.mouseMoveScenarioRecorderThread = threading.Thread(target=self.mouseMoveScenarioRecorder.start_scenario_record, daemon=True)
         self.mouseMoveScenarioRecorderThread.start()
         self.mouseClickScenarioRecorderThread = threading.Thread(target=self.mouseClickScenarioRecorder.start_scenario_record, daemon=True)
         self.mouseClickScenarioRecorderThread.start()
@@ -34,6 +35,7 @@ class MainWindow(Tk):
             self.after(50, self.check_threads_finished)
             return
 
+        pyautogui.moveTo(self.startMousePosition)
         self.deiconify()
         print("Запись завершена!")
 
