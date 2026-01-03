@@ -6,28 +6,38 @@ from abc import ABC, abstractmethod
 import copy
 
 class MouseScenarioRecorder(ABC):
+    def __init__(self):
+        self.scenario = []
+
+    def clear_scenario(self):
+        self.scenario.clear()
 
     def show_scenario(self):
         for command in self.scenario:
             print(command, sep=" ")
-
-    @abstractmethod
-    def start_scenario_record(self):
-        pass
-
-class MouseMoveScenarioRecorder(MouseScenarioRecorder):
-
-    def __init__(self):
-        self.scenario = []
 
     def start_scenario_record(self):
         self.prepare_for_record()
         self.record()
 
     def prepare_for_record(self):
-        self.scenario.append(pyautogui.position())
         self.clear_scenario()
         self.record_finished = False
+
+    @abstractmethod
+    def record(self):
+        pass
+
+    def finish_record(self):
+        self.record_finished = True
+
+    def get_scenario(self):
+        self.scenario.sort(key = lambda row: row[0])
+        return copy.deepcopy(self.scenario)
+
+class MouseMoveScenarioRecorder(MouseScenarioRecorder):
+    def __init__(self):
+        super().__init__()
 
     def record(self):
         stop_record_hotkey = keyboard.add_hotkey("ctrl+p", self.finish_record)
@@ -40,26 +50,11 @@ class MouseMoveScenarioRecorder(MouseScenarioRecorder):
     def append_scenario_element(self):
         self.scenario.append([datetime.datetime.now().time(), pyautogui.position()])
 
-    def clear_scenario(self):
-        if self.scenario:
-            self.scenario.clear()
-
-    def get_scenario(self):
-        self.scenario.sort(key = lambda row: row[0])
-        return copy.deepcopy(self.scenario)
-        #return [el[1] for el in self.scenario]
-
-    def finish_record(self):
-        self.record_finished = True
-
 class MouseClickScenarioRecorder(MouseScenarioRecorder):
-
     def __init__(self):
-        self.scenario = []
+        super().__init__()
 
-    def start_scenario_record(self):
-        self.record_finished = False
-        self.clear_scenario()
+    def record(self):
         stop_record_hotkey = keyboard.add_hotkey("ctrl+p", self.finish_record)
         listener = mouse.Listener(on_click=self.on_click_handler)
         listener.start()
@@ -70,15 +65,3 @@ class MouseClickScenarioRecorder(MouseScenarioRecorder):
 
     def on_click_handler(self, x, y, button, pressed):
         self.scenario.append([datetime.datetime.now().time(), pyautogui.Point(x, y)])
-
-    def get_scenario(self):
-        self.scenario.sort(key = lambda row: row[0])
-        return copy.deepcopy(self.scenario)
-        #return [el[1] for el in self.scenario]
-
-    def clear_scenario(self):
-        if self.scenario:
-            self.scenario.clear()
-
-    def finish_record(self):
-        self.record_finished = True
