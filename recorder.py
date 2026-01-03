@@ -65,3 +65,35 @@ class MouseClickScenarioRecorder(MouseScenarioRecorder):
 
     def on_click_handler(self, x, y, button, pressed):
         self.scenario.append([datetime.datetime.now().time(), pyautogui.Point(x, y)])
+
+import threading
+import event_types
+
+class RecorderController():
+    def __init__(self):
+        self.mouseMoveScenarioRecorder = MouseMoveScenarioRecorder()
+        self.mouseClickScenarioRecorder = MouseClickScenarioRecorder()
+
+    def start_record(self):
+        self.start_recorders_threads()
+
+    def start_recorders_threads(self):
+        self.mouseMoveScenarioRecorderThread = threading.Thread(target=self.mouseMoveScenarioRecorder.start_scenario_record, daemon=True)
+        self.mouseMoveScenarioRecorderThread.start()
+        self.mouseClickScenarioRecorderThread = threading.Thread(target=self.mouseClickScenarioRecorder.start_scenario_record, daemon=True)
+        self.mouseClickScenarioRecorderThread.start()
+
+    def is_threads_alive(self):
+        return self.mouseMoveScenarioRecorderThread.is_alive() or self.mouseClickScenarioRecorderThread.is_alive()
+
+    def calculate_general_scenario(self):
+        mouseMoveScenario = self.mouseMoveScenarioRecorder.get_scenario()
+        for el in mouseMoveScenario:
+            el.insert(0, event_types.MouseEvent.MouseMove)
+        mouseClickScenario = self.mouseClickScenarioRecorder.get_scenario()
+        for el in mouseClickScenario:
+            el.insert(0, event_types.MouseEvent.MouseLeftClick)
+
+        general_scenario = mouseMoveScenario + mouseClickScenario
+        general_scenario.sort(key=lambda row: row[1])
+        return general_scenario

@@ -1,23 +1,12 @@
 import pyautogui
-from enum import Enum
+import event_types
 
-class MouseEvent(Enum):
-    MouseMove = 1
-    MouseLeftClick = 2
 class MouseMover:
-    def __init__(self):
-        self.scenario = []
-
-    def set_scenario(self, scenario : list):
-        self.scenario = scenario
-
-    def start_scenario(self, startPosition: pyautogui.Point):
-        self.startPosition = startPosition
-        for point in self.scenario:
+    def exec_scenario(self, scenario : list):
+        for point in scenario:
             eventType = point[0]
             autoGuiPoint = point[2]
-            if eventType == MouseEvent.MouseMove:
+            if eventType == event_types.MouseEvent.MouseMove:
                 pyautogui.moveTo(autoGuiPoint.x, autoGuiPoint.y, duration=0.1)
-            elif eventType == MouseEvent.MouseLeftClick:
+            elif eventType == event_types.MouseEvent.MouseLeftClick:
                 pyautogui.click(autoGuiPoint.x, autoGuiPoint.y)
-        pyautogui.moveTo(self.startPosition)

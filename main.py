@@ -13,8 +13,7 @@ class MainWindow(Tk):
         self.title(self.applicationName)
         self.geometry('300x300')
         ttk.Button(self, text="Начать запись", command=self.start_scenario_record).pack()
-        self.mouseMoveScenarioRecorder = recorder.MouseMoveScenarioRecorder()
-        self.mouseClickScenarioRecorder = recorder.MouseClickScenarioRecorder()
+        self.recorderController = recorder.RecorderController()
         ttk.Button(self, text="Исполнить запись", command=self.exec_scenario).pack()
         self.mouseMover = mover.MouseMover()
 
@@ -23,44 +22,26 @@ class MainWindow(Tk):
         self.iconify()
         self.startMousePosition = pyautogui.position()
 
-        self.mouseMoveScenarioRecorderThread = threading.Thread(target=self.mouseMoveScenarioRecorder.start_scenario_record, daemon=True)
-        self.mouseMoveScenarioRecorderThread.start()
-        self.mouseClickScenarioRecorderThread = threading.Thread(target=self.mouseClickScenarioRecorder.start_scenario_record, daemon=True)
-        self.mouseClickScenarioRecorderThread.start()
-        self.check_threads_finished()
+        self.recorderController.start_record()
+        self.check_record_finished()
 
-    def check_threads_finished(self):
-        if (self.mouseMoveScenarioRecorderThread.is_alive() or
-            self.mouseClickScenarioRecorderThread.is_alive()):
-            self.after(50, self.check_threads_finished)
+    def check_record_finished(self):
+        if self.recorderController.is_threads_alive():
+            self.after(50, self.check_record_finished)
             return
 
         pyautogui.moveTo(self.startMousePosition)
         self.deiconify()
         print("Запись завершена!")
 
-    def calculate_general_scenario(self):
-        mouseMoveScenario = self.mouseMoveScenarioRecorder.get_scenario()
-        for el in mouseMoveScenario:
-            el.insert(0, mover.MouseEvent.MouseMove)
-        mouseClickScenario = self.mouseClickScenarioRecorder.get_scenario()
-        for el in mouseClickScenario:
-            el.insert(0, mover.MouseEvent.MouseLeftClick)
-
-        general_scenario = mouseMoveScenario + mouseClickScenario
-        general_scenario.sort(key=lambda row: row[1])
-        return general_scenario
-
     def exec_scenario(self):
         print("Началось исполнение записи")
         self.iconify()
+        self.startMousePosition = pyautogui.position()
 
-        current_scenario = self.calculate_general_scenario()
-        print(current_scenario)
-        self.mouseMover.set_scenario(current_scenario)
-        #self.mouseMoveScenarioRecorder.show_scenario()
-        self.mouseMover.start_scenario(pyautogui.position())
+        self.mouseMover.exec_scenario(self.recorderController.calculate_general_scenario())
 
+        pyautogui.moveTo(self.startMousePosition)
         self.deiconify()
         print("Закончилось исполнение записи")
     
