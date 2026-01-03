@@ -2,7 +2,6 @@ import keyboard
 from pynput import mouse
 import pyautogui
 import datetime
-from tkinter import Tk
 from abc import ABC, abstractmethod
 import copy
 
@@ -18,8 +17,7 @@ class MouseScenarioRecorder(ABC):
 
 class MouseMoveScenarioRecorder(MouseScenarioRecorder):
 
-    def __init__(self, parentWindow : Tk):
-        self.parentWindow = parentWindow
+    def __init__(self):
         self.scenario = []
 
     def start_scenario_record(self, startPosition: pyautogui.Point):
@@ -29,7 +27,6 @@ class MouseMoveScenarioRecorder(MouseScenarioRecorder):
 
     def prepare_for_record(self):
         self.scenario.append(pyautogui.position())
-        self.parentWindow.iconify()
         self.clear_scenario()
         self.record_finished = False
 
@@ -40,7 +37,6 @@ class MouseMoveScenarioRecorder(MouseScenarioRecorder):
             print(pyautogui.position())
             pyautogui.sleep(0.05)
         keyboard.remove_hotkey(stop_record_hotkey)
-        self.parentWindow.deiconify()
         pyautogui.moveTo(self.startPosition)
 
     def append_scenario_element(self):
@@ -60,8 +56,7 @@ class MouseMoveScenarioRecorder(MouseScenarioRecorder):
 
 class MouseClickScenarioRecorder(MouseScenarioRecorder):
 
-    def __init__(self, parentWindow : Tk):
-        self.parentWindow = parentWindow
+    def __init__(self):
         self.scenario = []
 
     def start_scenario_record(self):

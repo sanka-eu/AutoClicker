@@ -13,18 +13,19 @@ class MainWindow(Tk):
         self.title(self.applicationName)
         self.geometry('300x300')
         ttk.Button(self, text="Начать запись", command=self.start_scenario_record).pack()
-        self.mouseMoveScenarioRecorder = recorder.MouseMoveScenarioRecorder(self)
-        self.mouseClickScenarioRecorder = recorder.MouseClickScenarioRecorder(self)
+        self.mouseMoveScenarioRecorder = recorder.MouseMoveScenarioRecorder()
+        self.mouseClickScenarioRecorder = recorder.MouseClickScenarioRecorder()
         ttk.Button(self, text="Исполнить запись", command=self.exec_scenario).pack()
-        self.mouseMover = mover.MouseMover(self)
+        self.mouseMover = mover.MouseMover()
 
     def start_scenario_record(self):
         print("Запись началась")
+        self.iconify()
+
         self.mouseMoveScenarioRecorderThread = threading.Thread(target=self.mouseMoveScenarioRecorder.start_scenario_record, args=[pyautogui.position()], daemon=True)
         self.mouseMoveScenarioRecorderThread.start()
         self.mouseClickScenarioRecorderThread = threading.Thread(target=self.mouseClickScenarioRecorder.start_scenario_record, daemon=True)
         self.mouseClickScenarioRecorderThread.start()
-
         self.check_threads_finished()
 
     def check_threads_finished(self):
@@ -33,6 +34,7 @@ class MainWindow(Tk):
             self.after(50, self.check_threads_finished)
             return
 
+        self.deiconify()
         print("Запись завершена!")
 
     def calculate_general_scenario(self):
@@ -49,11 +51,15 @@ class MainWindow(Tk):
 
     def exec_scenario(self):
         print("Началось исполнение записи")
+        self.iconify()
+
         current_scenario = self.calculate_general_scenario()
         print(current_scenario)
         self.mouseMover.set_scenario(current_scenario)
         #self.mouseMoveScenarioRecorder.show_scenario()
         self.mouseMover.start_scenario(pyautogui.position())
+
+        self.deiconify()
         print("Закончилось исполнение записи")
     
     def take_screenshot(self):
