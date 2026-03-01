@@ -1,18 +1,25 @@
 ﻿"""Tkinter implementation of the UI presenter."""
 
+import sys
 import tkinter as tk
+from pathlib import Path
 from tkinter import ttk
 
 from autoclicker.application import AppController, UiPresenterPort
+
+_ICON_ICO_REL = Path("autoclicker") / "share" / "icons" / "icon.ico"
+_ICON_PNG_REL = Path("autoclicker") / "share" / "icons" / "icon.png"
 
 
 class TkinterMainWindow(tk.Tk, UiPresenterPort):
     def __init__(self, controller: AppController) -> None:
         super().__init__()
         self._controller = controller
+        self._window_icon_image = None
 
         self.title("AutoClicker")
         self.geometry("360x270")
+        self._apply_window_icon()
 
         self._status_var = tk.StringVar(value="Ready")
         self._speed_var = tk.StringVar(value="1.0")
@@ -92,3 +99,29 @@ class TkinterMainWindow(tk.Tk, UiPresenterPort):
     def _on_close(self) -> None:
         self._controller.on_stop_record_requested()
         self.destroy()
+
+    def _apply_window_icon(self) -> None:
+        ico_path = self._resolve_resource_path(_ICON_ICO_REL)
+        png_path = self._resolve_resource_path(_ICON_PNG_REL)
+
+        try:
+            if ico_path.exists():
+                self.iconbitmap(default=str(ico_path))
+                return
+        except tk.TclError:
+            pass
+
+        try:
+            if png_path.exists():
+                self._window_icon_image = tk.PhotoImage(file=str(png_path))
+                self.iconphoto(True, self._window_icon_image)
+        except tk.TclError:
+            pass
+
+    @staticmethod
+    def _resolve_resource_path(relative_path: Path) -> Path:
+        if getattr(sys, "frozen", False):
+            base = Path(getattr(sys, "_MEIPASS", Path(sys.executable).parent))
+        else:
+            base = Path(__file__).resolve().parents[3]
+        return base / relative_path
