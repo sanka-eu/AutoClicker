@@ -52,15 +52,45 @@ class AppController:
     def set_presenter(self, presenter: UiPresenterPort) -> None:
         self._presenter = presenter
 
+    def get_stop_record_hotkey(self) -> str:
+        return self._start_recording_use_case.get_stop_hotkey()
+
+    def capture_stop_record_hotkey(self) -> str:
+        with self._lock:
+            if self._session_state.is_recording:
+                raise RuntimeError("Cannot capture hotkey while recording")
+        return self._start_recording_use_case.capture_hotkey()
+
+    def on_change_stop_hotkey_requested(self, new_hotkey: str) -> bool:
+        with self._lock:
+            if self._session_state.is_recording:
+                self._presenter.on_error("Cannot change hotkey while recording")
+                return False
+
+            try:
+                self._start_recording_use_case.set_stop_hotkey(new_hotkey)
+            except ValueError as exc:
+                self._presenter.on_error(str(exc))
+                return False
+
+            hotkey = self._start_recording_use_case.get_stop_hotkey()
+            self._presenter.show_status(f"Stop hotkey set to: {hotkey}")
+            return True
+
     def on_start_record_clicked(self) -> None:
         with self._lock:
             if self._session_state.is_recording:
                 self._presenter.show_status("Recording is already running")
                 return
 
-            self._start_recording_use_case.execute(self.on_stop_record_requested)
+            hotkey = self._start_recording_use_case.get_stop_hotkey()
+            try:
+                self._start_recording_use_case.execute(self.on_stop_record_requested)
+            except Exception as exc:  # pragma: no cover
+                self._presenter.on_error(f"Failed to start recording: {exc}")
+                return
             self._presenter.on_recording_started()
-            self._presenter.show_status("Recording started. Press Ctrl+P to stop")
+            self._presenter.show_status(f"Recording started. Press {hotkey} to stop")
 
     def on_stop_record_requested(self) -> None:
         with self._lock:

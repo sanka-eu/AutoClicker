@@ -49,6 +49,10 @@ class HotkeyManagerPort(ABC):
     def unregister(self, hotkey_id: object) -> None:
         raise NotImplementedError
 
+    @abstractmethod
+    def capture_hotkey(self) -> str:
+        raise NotImplementedError
+
 
 class UiPresenterPort(ABC):
     @abstractmethod

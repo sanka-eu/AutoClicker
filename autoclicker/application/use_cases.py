@@ -45,6 +45,18 @@ class StartRecordingUseCase:
         self._state.is_recording = True
         self._state.stop_hotkey_id = hotkey_id
 
+    def get_stop_hotkey(self) -> str:
+        return self._stop_hotkey
+
+    def set_stop_hotkey(self, hotkey: str) -> None:
+        normalized = hotkey.strip().lower()
+        if not normalized:
+            raise ValueError("Stop hotkey cannot be empty")
+        self._stop_hotkey = normalized
+
+    def capture_hotkey(self) -> str:
+        return self._hotkeys.capture_hotkey()
+
 
 class StopRecordingUseCase:
     def __init__(
