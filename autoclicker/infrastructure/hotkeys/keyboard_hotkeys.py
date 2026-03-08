@@ -14,3 +14,6 @@ class KeyboardHotkeyManager(HotkeyManagerPort):
             hotkey_id()
             return
         keyboard.remove_hotkey(hotkey_id)
+
+    def capture_hotkey(self) -> str:
+        return keyboard.read_hotkey(suppress=False)
